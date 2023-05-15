@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorator="template">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
   <meta charset="utf-8">
   <title>Connexion</title>
+  <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/4.3.1/css/bootstrap.min.css}" />
+  <script src="/webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </head>
 <body>
 <div layout:fragment="Mycontent">
@@ -13,17 +14,20 @@
       <div class="card">
         <div class="card-header">Connexion</div>
         <div class="card-body">
-          <form th:action="@{login}" method="post">
+          <form method="post" action="loginProcess">
             <div class="form-group">
               <label class="control-label" >Utilisateur :</label>
-              <input type="text" name="username">
+              <input type="text" name="username" th:value="${username}">
             </div>
             <div class="form-group">
               <label class="control-label" >Mot de passe :</label>
-              <input type="password" name="password" >
+              <input type="password" name="password" th:value="${password}">
             </div>
-            <button class="btn btn-primary">se connecter</button>
+            <input class="btn btn-primary" type="submit" value="se connecter"/>
             <button class="btn btn-primary">Ajouter un Compte</button>
+            <div th:if="${error}">
+              <p th:text="'Message: ' + ${error}"/>
+            </div>
           </form>
         </div>
       </div>

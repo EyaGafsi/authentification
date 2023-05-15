@@ -11,18 +11,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
-@Service
+@Service("UserService")
 @Slf4j
 public class UserService implements UserDetailsService {
-    private final UserRepository userRepository;
+
     @Autowired
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    UserRepository userRepository;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Objects.requireNonNull(username);
-        User user = userRepository.findUserWithName(username)
+        User user = userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return user;
     }

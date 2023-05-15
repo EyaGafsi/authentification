@@ -7,13 +7,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
-
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
@@ -23,7 +24,6 @@ import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuc
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 
 @Configuration
@@ -36,8 +36,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public static final String AUTHORITIES_CLAIM_NAME = "roles";
     @Autowired
     UserService userDetailsService;
-    @Autowired
-    private AccessDeniedHandler accessDeniedHandler;
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return userDetailsService;
+    }
 
     @Bean
     @Lazy
@@ -50,28 +53,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
         http.csrf().disable()
                 .authenticationProvider(getProvider())
                 .formLogin()
                 .loginProcessingUrl("/login")
+                .loginPage("/login")
                 .successHandler(new AuthentificationLoginSuccessHandler())
                 .failureHandler(new SimpleUrlAuthenticationFailureHandler())
+                .permitAll()
                 .and()
                 .logout()
                 .logoutUrl("/logout")
                 .logoutSuccessHandler(new AuthentificationLogoutSuccessHandler())
                 .invalidateHttpSession(true)
+                .permitAll()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/login").permitAll()
-                .antMatchers("/logout").permitAll()
+                .antMatchers("/login", "/logout", "/webjars/**").permitAll()
                 .anyRequest().authenticated();
-        http.formLogin().loginPage("/login");
-        http.authorizeRequests().antMatchers("/login").permitAll();
-        http.authorizeRequests().antMatchers("/webjars/**").permitAll();
-        http.authorizeRequests().anyRequest().authenticated();
-
     }
     private class AuthentificationLoginSuccessHandler extends
             SimpleUrlAuthenticationSuccessHandler {
@@ -87,10 +86,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             response.setStatus(HttpServletResponse.SC_OK);
         }
     }
+
     @Bean
     public AuthenticationProvider getProvider() {
-        AppAuthProvider provider = new AppAuthProvider();
-        provider.setUserDetailsService(userDetailsService);
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService());
         return provider;
     }
+
 }
