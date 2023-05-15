@@ -14,7 +14,7 @@
       <div class="card">
         <div class="card-header">Connexion</div>
         <div class="card-body">
-          <form method="post" action="loginProcess">
+          <form method="post" th:action="@{processLogin}">
             <div class="form-group">
               <label class="control-label" >Utilisateur :</label>
               <input type="text" name="username" th:value="${username}">
@@ -23,7 +23,7 @@
               <label class="control-label" >Mot de passe :</label>
               <input type="password" name="password" th:value="${password}">
             </div>
-            <input class="btn btn-primary" type="submit" value="se connecter"/>
+            <input class="btn btn-primary" type="submit"  value="se connecter"/>
             <button class="btn btn-primary">Ajouter un Compte</button>
             <div th:if="${error}">
               <p th:text="'Message: ' + ${error}"/>

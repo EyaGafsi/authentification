@@ -45,7 +45,7 @@ public class SecurityController {
         return "index";
     }
 
-    @PostMapping("/login")
+    @PostMapping("/processLogin")
     public String processLogin(@RequestParam("username") String username,
                                @RequestParam("password") String password,
                                ModelMap modelMap) throws ParseException {
